@@ -1,0 +1,17 @@
+<?xml version="1.0"?>
+<package >
+  <metadata>
+    <id>FreezableCollections</id>
+    <version>0.1.0</version>
+    <title>$title$</title>
+    <authors>Dmitry Naumov</authors>
+    <owners>Dmitry Naumov</owners>
+    <projectUrl>https://github.com/DmitryNaumov/FreezableCollections</projectUrl>
+    <requireLicenseAcceptance>false</requireLicenseAcceptance>
+    <summary>Mutable collections which can be turned into immutable.</summary>
+    <description>FreezableCollections provide efficient way to start working with mutable collection and then convert it to immutable, type-safe version with zero cost.</description>
+
+    <copyright>Copyright 2015</copyright>
+    <tags></tags>
+  </metadata>
+</package>
