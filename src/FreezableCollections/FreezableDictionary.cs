@@ -22,11 +22,13 @@ namespace FreezableCollections
 
         public bool IsFrozen { get; private set; }
 
-        public void Freeze()
+        public IFrozenDictionary<TKey, TValue> Freeze()
         {
             Interlocked.Exchange(ref _dictionary, new ReadOnlyDictionary<TKey, TValue>(_dictionary));
 
             IsFrozen = true;
+
+            return new FrozenDictionary(this);
         }
 
         #region Delegated members
@@ -169,8 +171,8 @@ namespace FreezableCollections
 
         object IDictionary.this[object key]
         {
-            get { throw new NotImplementedException(); }
-            set { throw new NotImplementedException(); }
+            get { return ((IDictionary)_dictionary)[key]; }
+            set { ((IDictionary)_dictionary)[key] = value; }
         }
 
         ICollection<TKey> IDictionary<TKey, TValue>.Keys
@@ -183,12 +185,94 @@ namespace FreezableCollections
             get { return _dictionary.Values; }
         }
 
-        TValue IDictionary<TKey, TValue>.this[TKey key]
-        {
-            get { throw new NotImplementedException(); }
-            set { throw new NotImplementedException(); }
-        }
-
         #endregion
+
+        // NOTE: Inherit from ICollection<T> to support existing LINQ optimizations (like Count())
+        private class FrozenDictionary : IFrozenDictionary<TKey, TValue>, ICollection<KeyValuePair<TKey, TValue>>
+        {
+            private readonly IDictionary<TKey, TValue> _dictionary;
+
+            public FrozenDictionary(FreezableDictionary<TKey, TValue> dictionary)
+            {
+                if (!dictionary.IsFrozen)
+                    throw new InvalidOperationException();
+
+                _dictionary = dictionary._dictionary;
+            }
+
+            public int Count
+            {
+                get { return _dictionary.Count; }
+            }
+
+            public bool ContainsKey(TKey key)
+            {
+                return _dictionary.ContainsKey(key);
+            }
+
+            public IEnumerator<KeyValuePair<TKey, TValue>> GetEnumerator()
+            {
+                return _dictionary.GetEnumerator();
+            }
+
+            public bool TryGetValue(TKey key, out TValue value)
+            {
+                return _dictionary.TryGetValue(key, out value);
+            }
+
+            public IEnumerable<TKey> Keys
+            {
+                get { return _dictionary.Keys; }
+            }
+
+            public IEnumerable<TValue> Values
+            {
+                get { return _dictionary.Values; }
+            }
+
+            public TValue this[TKey key]
+            {
+                get { return _dictionary[key]; }
+            }
+
+            #region ICollection<KeyValuePair<TKey, TValue>> members
+
+            void ICollection<KeyValuePair<TKey, TValue>>.Add(KeyValuePair<TKey, TValue> item)
+            {
+                throw new InvalidOperationException();
+            }
+
+            void ICollection<KeyValuePair<TKey, TValue>>.Clear()
+            {
+                throw new InvalidOperationException();
+            }
+
+            bool ICollection<KeyValuePair<TKey, TValue>>.Contains(KeyValuePair<TKey, TValue> item)
+            {
+                throw new InvalidOperationException();
+            }
+
+            void ICollection<KeyValuePair<TKey, TValue>>.CopyTo(KeyValuePair<TKey, TValue>[] array, int arrayIndex)
+            {
+                throw new InvalidOperationException();
+            }
+
+            bool ICollection<KeyValuePair<TKey, TValue>>.IsReadOnly
+            {
+                get { return true; }
+            }
+
+            bool ICollection<KeyValuePair<TKey, TValue>>.Remove(KeyValuePair<TKey, TValue> item)
+            {
+                throw new InvalidOperationException();
+            }
+
+            #endregion
+
+            IEnumerator IEnumerable.GetEnumerator()
+            {
+                return ((IEnumerable)_dictionary).GetEnumerator();
+            }
+        }
     }
 }

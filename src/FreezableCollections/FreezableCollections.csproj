@@ -45,6 +45,7 @@
     <Compile Include="EnumerableExtensions.cs" />
     <Compile Include="FreezableDictionary.cs" />
     <Compile Include="FreezableList.cs" />
+    <Compile Include="FrozenDictionary.cs" />
     <Compile Include="FrozenList.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
