@@ -3,7 +3,6 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Diagnostics.CodeAnalysis;
-using System.Threading;
 
 namespace FreezableCollections
 {
@@ -27,15 +26,16 @@ namespace FreezableCollections
             _list = new List<T>(collection);
         }
 
-        public bool IsFrozen { get; private set; }
+        public bool IsFrozen
+        {
+            get { return _list.IsReadOnly; }
+        }
 
         public IFrozenList<T> Freeze()
         {
             if (!IsFrozen)
             {
-                IsFrozen = true;
-
-                Interlocked.Exchange(ref _list, new ReadOnlyCollection<T>(_list));
+                _list = new ReadOnlyCollection<T>(_list);
             }
 
             return new FrozenList(this);

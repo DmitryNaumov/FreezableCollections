@@ -2,7 +2,6 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.Threading;
 
 namespace FreezableCollections
 {
@@ -20,15 +19,16 @@ namespace FreezableCollections
             _dictionary = new Dictionary<TKey, TValue>(capacity, comparer);
         }
 
-        public bool IsFrozen { get; private set; }
+        public bool IsFrozen
+        {
+            get { return _dictionary.IsReadOnly; }
+        }
 
         public IFrozenDictionary<TKey, TValue> Freeze()
         {
             if (!IsFrozen)
             {
-                IsFrozen = true;
-
-                Interlocked.Exchange(ref _dictionary, new ReadOnlyDictionary<TKey, TValue>(_dictionary));
+                _dictionary = new ReadOnlyDictionary<TKey, TValue>(_dictionary);
             }
 
             return new FrozenDictionary(this);
