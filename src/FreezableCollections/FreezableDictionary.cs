@@ -24,9 +24,12 @@ namespace FreezableCollections
 
         public IFrozenDictionary<TKey, TValue> Freeze()
         {
-            Interlocked.Exchange(ref _dictionary, new ReadOnlyDictionary<TKey, TValue>(_dictionary));
+            if (!IsFrozen)
+            {
+                IsFrozen = true;
 
-            IsFrozen = true;
+                Interlocked.Exchange(ref _dictionary, new ReadOnlyDictionary<TKey, TValue>(_dictionary));
+            }
 
             return new FrozenDictionary(this);
         }

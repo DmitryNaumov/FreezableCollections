@@ -31,9 +31,12 @@ namespace FreezableCollections
 
         public IFrozenList<T> Freeze()
         {
-            IsFrozen = true;
+            if (!IsFrozen)
+            {
+                IsFrozen = true;
 
-            Interlocked.Exchange(ref _list, new ReadOnlyCollection<T>(_list));
+                Interlocked.Exchange(ref _list, new ReadOnlyCollection<T>(_list));
+            }
 
             return new FrozenList(this);
         }
@@ -170,14 +173,14 @@ namespace FreezableCollections
         // NOTE: Inherit from ICollection<T> to support existing LINQ optimizations (like Count())
         private class FrozenList : IFrozenList<T>, ICollection<T>
         {
-            private readonly FreezableList<T> _list;
+            private readonly IList<T> _list;
 
             public FrozenList(FreezableList<T> list)
             {
                 if (!list.IsFrozen)
                     throw new InvalidOperationException();
 
-                _list = list;
+                _list = list._list;
             }
 
             #region IReadOnlyList<T>, ICollection<T> members
