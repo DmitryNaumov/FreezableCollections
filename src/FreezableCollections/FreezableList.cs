@@ -1,14 +1,16 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Diagnostics.CodeAnalysis;
+using System.Threading;
 
 namespace FreezableCollections
 {
     [SuppressMessage("Microsoft.Naming", "CA1710:IdentifiersShouldHaveCorrectSuffix", Justification = "There is no rule for classes implementing IList")]
     public class FreezableList<T> : IList<T>, ICollection<T>, IList, ICollection, IReadOnlyList<T>, IReadOnlyCollection<T>, IEnumerable<T>, IEnumerable
     {
-        private readonly List<T> _list;
+        private IList<T> _list;
 
         public FreezableList()
         {
@@ -31,21 +33,15 @@ namespace FreezableCollections
         {
             IsFrozen = true;
 
-            return new FrozenList(this);
-        }
+            Interlocked.Exchange(ref _list, new ReadOnlyCollection<T>(_list));
 
-        private void ThrowIfFrozen()
-        {
-            if (IsFrozen)
-                throw new InvalidOperationException("The list is immutable.");
+            return new FrozenList(this);
         }
 
         #region Delegated members
 
         public void Add(T item)
         {
-            ThrowIfFrozen();
-
             _list.Add(item);
         }
 
@@ -56,8 +52,6 @@ namespace FreezableCollections
 
         public void Clear()
         {
-            ThrowIfFrozen();
-
             _list.Clear();
         }
 
@@ -83,8 +77,6 @@ namespace FreezableCollections
 
         public void Insert(int index, T item)
         {
-            ThrowIfFrozen();
-
             _list.Insert(index, item);
         }
 
@@ -95,8 +87,6 @@ namespace FreezableCollections
 
         public void RemoveAt(int index)
         {
-            ThrowIfFrozen();
-
             _list.RemoveAt(index);
         }
 
@@ -105,8 +95,6 @@ namespace FreezableCollections
             get { return _list[index]; }
             set
             {
-                ThrowIfFrozen();
-
                 _list[index] = value;
             }
         }
@@ -138,8 +126,6 @@ namespace FreezableCollections
 
         int IList.Add(object value)
         {
-            ThrowIfFrozen();
-
             return ((IList)_list).Add(value);
         }
 
@@ -155,8 +141,6 @@ namespace FreezableCollections
 
         void IList.Insert(int index, object value)
         {
-            ThrowIfFrozen();
-
             ((IList)_list).Insert(index, value);
         }
 
@@ -172,20 +156,13 @@ namespace FreezableCollections
 
         void IList.Remove(object value)
         {
-            ThrowIfFrozen();
-
             ((IList)_list).Remove(value);
         }
 
         object IList.this[int index]
         {
             get { return ((IList)_list)[index]; }
-            set
-            {
-                ThrowIfFrozen();
-
-                ((IList)_list)[index] = value;
-            }
+            set { ((IList)_list)[index] = value; }
         }
 
         #endregion
