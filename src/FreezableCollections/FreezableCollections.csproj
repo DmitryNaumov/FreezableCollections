@@ -44,9 +44,10 @@
     </Compile>
     <Compile Include="EnumerableExtensions.cs" />
     <Compile Include="FreezableDictionary.cs" />
+    <Compile Include="FreezableEmpty.cs" />
     <Compile Include="FreezableList.cs" />
-    <Compile Include="FrozenDictionary.cs" />
-    <Compile Include="FrozenList.cs" />
+    <Compile Include="IFrozenDictionary.cs" />
+    <Compile Include="IFrozenList.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
