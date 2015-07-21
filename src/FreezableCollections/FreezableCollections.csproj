@@ -44,6 +44,7 @@
     </Compile>
     <Compile Include="EnumerableExtensions.cs" />
     <Compile Include="FreezableDictionary.cs" />
+    <Compile Include="FreezableEmpty.cs" />
     <Compile Include="FreezableList.cs" />
     <Compile Include="FrozenDictionary.cs" />
     <Compile Include="FrozenList.cs" />
